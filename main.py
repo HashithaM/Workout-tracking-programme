@@ -1,64 +1,41 @@
-import requests
+import os
 from datetime import datetime
 
-USER_NAME = "hashitha"
-TOKEN = "HashithaMihiran98"
-GRAPH_ID = "graph1"
+import requests
 
-pixela_endpoint = "https://pixe.la/v1/users"
 
-user_params = {
-    "token": TOKEN,
-    "username": USER_NAME,
-    "agreeTermsOfService": "yes",
-    "notMinor": "yes",
-}
+PIXELA_ENDPOINT = "https://pixe.la/v1/users"
 
-# response = requests.post(url=pixela_endpoint, json=user_params)
-# print(response.text)
 
-graph_endpoint = f"{pixela_endpoint}/{USER_NAME}/graphs"
+def required_env(name):
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value
 
-graph_config = {
-    "id": GRAPH_ID,
-    "name": "Cycling Graph",
-    "unit": "Km",
-    "type": "float",
-    "color": "sora"
-}
 
-headers = {
-    "X-USER-TOKEN": TOKEN
-}
+def main():
+    username = required_env("PIXELA_USERNAME")
+    token = required_env("PIXELA_TOKEN")
+    graph_id = required_env("PIXELA_GRAPH_ID")
 
-# response = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
-# print(response.text)
+    today = datetime.now()
+    pixel_endpoint = f"{PIXELA_ENDPOINT}/{username}/graphs/{graph_id}"
+    pixel_data = {
+        "date": today.strftime("%Y%m%d"),
+        "quantity": input("How many kilometers did you cycle today? "),
+    }
+    headers = {"X-USER-TOKEN": token}
 
-view_graph = "https://pixe.la/v1/users/a-know/graphs/test-graph"
+    response = requests.post(
+        url=pixel_endpoint,
+        json=pixel_data,
+        headers=headers,
+        timeout=30,
+    )
+    response.raise_for_status()
+    print(response.text)
 
-pixel_creation_endpoint = f"{pixela_endpoint}/{USER_NAME}/graphs/{GRAPH_ID}"
 
-# today = datetime(year=2023, month=7, day=13)
-today = datetime.now()
-
-pixel_data = {
-    "date": today.strftime("%Y%m%d"),
-    "quantity": input("How many kilometers did you cycle today ?")
-}
-
-response = requests.post(url=pixel_creation_endpoint, json=pixel_data, headers=headers)
-print(response.text)
-
-update_endpoint = f"{pixela_endpoint}/{USER_NAME}/graphs/{GRAPH_ID}/{today.strftime('%Y%m%d')}"
-
-new_pixel_data = {
-    "quantity": "4.56"
-}
-
-# response = requests.put(url=update_endpoint, json=new_pixel_data, headers=headers)
-# print(response.text)
-
-delete_endpoint = f"{pixela_endpoint}/{USER_NAME}/graphs/{GRAPH_ID}/{today.strftime('%Y%m%d')}"
-
-# response = requests.delete(url=delete_endpoint, headers=headers)
-# print(response.text)
+if __name__ == "__main__":
+    main()

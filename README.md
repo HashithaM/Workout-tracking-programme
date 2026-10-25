@@ -1,13 +1,12 @@
 # Pixela Workout Tracker
 
-A command-line exercise that records cycling distance on a Pixela graph. The source also includes examples for creating a user and graph and for updating or deleting a daily pixel.
+A command-line exercise that records cycling distance on a Pixela graph using private runtime configuration.
 
 ## Workflow
 
 - Prompt for kilometres cycled today
 - Format the current date for the Pixela API
 - Submit an authenticated pixel to the configured graph
-- Provide commented examples for graph creation, updates, and deletion
 
 ## Requirements
 
@@ -15,16 +14,22 @@ A command-line exercise that records cycling distance on a Pixela graph. The sou
 pip install requests
 ```
 
-## Security warning
+## Secure configuration
 
-> [!CAUTION]
-> The current source contains a user-scoped Pixela token. Treat it as exposed: rotate it, remove it from public source/history, and load the replacement from an environment variable or secret manager.
+Set these environment variables before running the script:
 
-The username, graph ID, and token should all be external configuration. Never commit account tokens.
+- `PIXELA_USERNAME`
+- `PIXELA_TOKEN`
+- `PIXELA_GRAPH_ID`
+
+`.env.example` contains dummy values and `.env` is ignored by Git. Never commit an account token.
+
+> [!IMPORTANT]
+> Revoke any Pixela token that appeared in an earlier public revision. Replacing the current source does not invalidate an exposed token or erase Git history.
 
 ## Run
 
-After rotating and safely configuring the token:
+After securely configuring the variables:
 
 ```bash
 python main.py
